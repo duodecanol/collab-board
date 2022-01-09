@@ -26,14 +26,17 @@ class Container extends React.Component
 
           <div className='brushsize-container'>
             Brush Size: &nbsp;
-            <select value={ this.state.size } onChange={ this.changeSize.bind(this) }>
-              <option> 5 </option>
-              <option> 10 </option>
-              <option> 15 </option>
-              <option> 20 </option>
-              <option> 25 </option>
-              <option> 30 </option>
-            </select>
+            <input type="range" min="1" max="100" class="slider" id="myRange"
+              value={ this.state.size }
+              onChange={ this.changeSize.bind(this) }
+            />
+            <span>{ this.state.size } px</span>
+          </div>
+            <svg id="brush-size-circle" width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="50" cy="50" r={ this.state.size / 2 } stroke="black" stroke-width="1" fill="none"/>
+            </svg>
+          <div>
+            
           </div>
         </div>
 
