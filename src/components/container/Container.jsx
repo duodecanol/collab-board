@@ -33,7 +33,7 @@ class Container extends React.Component
             <span>{ this.state.size } px</span>
           </div>
             <svg id="brush-size-circle" width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="50" cy="50" r={ this.state.size / 2 } stroke="black" stroke-width="1" fill="none"/>
+              <circle cx="50" cy="50" r={ this.state.size / 2 } stroke={ this.state.color } stroke-width="2" fill="none"/>
             </svg>
           <div>
             
