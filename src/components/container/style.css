@@ -1,14 +1,22 @@
-.container {
+    .container {
     position: fixed;
     width: 100%;
     height: 100%;
-    background: black;
+    background-color: #dadce0;
+}
+
+.tools-section {
+    position: fixed;
+    left: 16px;
+    top: 50%;
 }
 
 .color-picker-container {
-    text-align: center;
-    display: inline;
-    color: white;
+    margin-left: 4px;
+}
+
+.brushsize-container {
+    margin-left: 4px;
 }
 
 .board-container {

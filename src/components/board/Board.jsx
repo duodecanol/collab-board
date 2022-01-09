@@ -43,6 +43,11 @@ class Board extends React.Component
     this.drawOnCanvas();
   }
 
+  componentWillReceiveProps(newProps) {
+    this.ctx.strokeStyle = newProps.color;
+    this.ctx.lineWidth = newProps.size;
+  }
+
   drawOnCanvas() {
     var canvas = document.querySelector('#board');
     this.ctx = canvas.getContext('2d');
@@ -67,10 +72,10 @@ class Board extends React.Component
 
 
     /* Drawing on Paint App */
-    ctx.lineWidth = 3;
+    ctx.lineWidth = this.props.size;
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';
-    ctx.strokeStyle = 'blue';
+    ctx.strokeStyle = this.props.color;
 
     canvas.addEventListener('mousedown', function(e) {
         canvas.addEventListener('mousemove', onPaint, false);
@@ -88,7 +93,9 @@ class Board extends React.Component
         ctx.closePath();
         ctx.stroke();
 
-      if (root.timeout != undefined) clearTimeout(root.timeout);
+      if (root.timeout != undefined)
+        clearTimeout(root.timeout);
+
       root.timeout = setTimeout(function(){
         var base64ImageData = canvas.toDataURL("image/png");
         root.socket.emit("canvas-data", base64ImageData);
