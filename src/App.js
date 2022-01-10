@@ -3,12 +3,14 @@ import 'bootstrap/dist/css/bootstrap.css';
 
 import BoardFrame from './components/boardframe/BoardFrame';
 import Ribbon from './components/ribbon/Ribbon';
+import ToolBox from './components/toolbox/ToolBox';
 
 function App() {
   return (
 <>
 <Ribbon />
-<BoardFrame />
+<ToolBox />
+{/* <BoardFrame /> */}
 </>
   );
 }
