@@ -1,0 +1,109 @@
+.ribbon {
+    z-index: 101;
+}
+
+hr {
+    height: auto !important;
+    margin-top: 2px !important;
+    margin-bottom: 2px !important;
+}
+.jam-bar-button {
+    margin: 4px 8px;
+    height: 40px;
+    width: 40px;
+    -webkit-border-radius: 50%;
+    display: inline-block;
+    cursor: pointer;
+    outline: none;
+}
+
+.jam-bar-logo {
+    background-image: url("https://www.gstatic.com/docs/karma/logo_jamboard_color_1x_web_40dp.png");
+    height: 40px;
+    width: 40px;
+    background-size: 40px 40px;
+}
+
+.jam-bar-rename-button {
+    --docs-material-font-family: Roboto, RobotoDraft, Helvetica, Arial,
+        sans-serif;
+    --docs-material-font-weight-normal: 400;
+    --docs-material-font-weight-bold: 500;
+    --docs-material-font-size-normal: 14px;
+    --docs-material-font-size-9: 9px;
+    --docs-material-font-size-11: 11px;
+    --docs-material-font-size-12: 12px;
+    --docs-material-font-size-22: 22px;
+    --docs-material-header-font-family: "Google Sans", Roboto, RobotoDraft,
+        Helvetica, Arial, sans-serif;
+    font-weight: normal;
+    display: inline-block;
+    max-width: calc(100vw - 300px);
+    color: rgb(255, 255, 255);
+    font-family: Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
+    font-size: 18px;
+    cursor: pointer;
+    outline: none;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    user-select: none;
+}
+
+.jam-bar-center-menu {
+    color: black;
+    font-weight: normal;
+    font-size: 13px;
+    display: inline-flex;
+    top: 0px;
+    min-height: 64px;
+    align-items: center;
+    flex: 0 0 auto;
+    max-width: 100%;
+    align-self: center;
+    /* position: fixed;
+    left: 50%;
+    transform: translateX(-50%); */
+}
+
+.jam-collapsed-presence-bar {
+    color: black;
+    font-weight: normal;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    outline: none;
+    user-select: none;
+}
+
+.jam-flatbutton-overlay {
+    background: rgb(0,0,0);
+    content: "";
+    height: 100%;
+    left: 0px;
+    opacity: 0;
+    position: relative;
+    top: 0px;
+    width: 100%;
+}
+
+.jam-icon-arrow-left-black {
+    width: 24px;
+    height: 24px;
+    background: no-repeat
+        url("data:image/svg+xml;base64,PHN2ZyBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCAyNCAyNCIgZmlsbD0iIzAwMDAwMCIgaGVpZ2h0PSIyNHB4IiBpZD0iTGF5ZXJfMSIgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIwIDAgMjQgMjQiIHdpZHRoPSIyNHB4IiB4PSIwcHgiIHhtbDpzcGFjZT0icHJlc2VydmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHk9IjBweCI+PHBhdGggZD0iTTE1LjQxLDE2LjU5TDEwLjgzLDEybDQuNTgtNC41OUwxNCw2bC02LDZsNiw2TDE1LjQxLDE2LjU5eiIvPjxwYXRoIGQ9Ik0wLDBoMjR2MjRIMFYweiIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==");
+}
+
+.jam-icon-arrow-right-black {
+    width: 24px;
+    height: 24px;
+    background: no-repeat
+        url("data:image/svg+xml;base64,PHN2ZyBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCAyNCAyNCIgZmlsbD0iIzAwMDAwMCIgaGVpZ2h0PSIyNHB4IiBpZD0iTGF5ZXJfMSIgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIwIDAgMjQgMjQiIHdpZHRoPSIyNHB4IiB4PSIwcHgiIHhtbDpzcGFjZT0icHJlc2VydmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHk9IjBweCI+PHBhdGggZD0iTTguNTksMTYuNTlMMTMuMTcsMTJMOC41OSw3LjQxTDEwLDZsNiw2bC02LDZMOC41OSwxNi41OXoiLz48cGF0aCBkPSJNMCwwaDI0djI0SDBWMHoiIGZpbGw9Im5vbmUiLz48L3N2Zz4=");
+}
+
+.threedot-dropdown-menu {
+    width: 24px;
+    height: 24px;
+    background: no-repeat
+        url("data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjMDAwMDAwIiBoZWlnaHQ9IjI0cHgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0cHgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTAgMGgyNHYyNEgweiIgZmlsbD0ibm9uZSIvPjxwYXRoIGQ9Ik0xMiA4YzEuMSAwIDItLjkgMi0ycy0uOS0yLTItMi0yIC45LTIgMiAuOSAyIDIgMnptMCAyYy0xLjEgMC0yIC45LTIgMnMuOSAyIDIgMiAyLS45IDItMi0uOS0yLTItMnptMCA2Yy0xLjEgMC0yIC45LTIgMnMuOSAyIDIgMiAyLS45IDItMi0uOS0yLTItMnoiLz48L3N2Zz4=");
+}
