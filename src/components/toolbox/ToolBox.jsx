@@ -1,4 +1,4 @@
-import { Box, Container, Toolbar, IconButton, ButtonGroup, Tooltip, Popper } from '@mui/material';
+import { Box, Container, Toolbar, IconButton, ButtonGroup, Tooltip, Popper, Popover, Button } from '@mui/material';
 import React from 'react';
 
 import UndoIcon from '@mui/icons-material/Undo';
@@ -8,7 +8,20 @@ import UndoIcon from '@mui/icons-material/Undo';
 import './style.css';
 
 const ToolBox = () => {
-  const [anchorElNav, setAnchorElNav] = React.useState(null);
+  // const [anchorElNav, setAnchorElNav] = React.useState(null);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? 'simple-popover' : undefined;
+
 
   return (
 <Box sx={{ 
@@ -32,31 +45,12 @@ const ToolBox = () => {
   <Container fixed disableGutters>
     <Toolbar disableGutters>
       <ButtonGroup orientation='vertical'>
-        <IconButton>
+
+        <IconButton aria-describedby={id} variant="contained" onClick={handleClick}>
           <UndoIcon fontSize='large' sx={{ color: '#777777' }}/>
         </IconButton>
 
-        <Tooltip title="Pen" placement="right">
-          <IconButton className="pen" component="div">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24"><path fill="none" d="M24 0v24H0V0h24z"></path><path d="M3 17.25V21h3.74l7.54-7.53-3.75-3.75L3 17.25zM18.37 3.3l2.34 2.33c.39.39.4 1.03.01 1.42l-5.37 5.36-3.76-3.76 2.53-2.53-.73-.73-5.66 5.66-1.4-1.4 6.37-6.36c.39-.39 1.04-.38 1.42.01l1.42 1.41 1.42-1.41c.38-.39 1.02-.39 1.41 0z"></path></svg>
-          </IconButton>
-        </Tooltip>
-        
-        <Tooltip title="Marker" placement="right">
-          <IconButton className='marker' component="div">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0V0z"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M9.7 9.49l4.29 4.3-6.54 6.54-.72-.72-1.43 1.43c-.79.79-2.07.79-2.86 0s-.79-2.08 0-2.86l1.43-1.43-.72-.72L9.7 9.49zm11.56-5.8L19.8 2.22c-.78-.78-2.05-.78-2.83 0l-6.21 6.21 4.29 4.3 6.21-6.21c.79-.78.79-2.05 0-2.83z"></path></svg>
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Highligter" placement="right">
-          <IconButton className='highlighter' component="div">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0V0z"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M10.22 9.49l-5.91 6c-.77.8-.7 2.05.08 2.85L.77 22h5.68l.74-.75c.78.81 1.95.86 2.73.05l5.96-6.05-5.66-5.76zm12.46-4l-2.82-2.87c-.78-.8-2.07-.84-2.84-.04l-5.75 5.85 5.66 5.75 5.69-5.78c.77-.81.83-2.11.06-2.91z"></path></svg>
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Brush" placement="right">
-          <IconButton className='brush' component="div">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"></path><path d="M7 14c-1.66 0-3 1.34-3 3 0 1.31-1.16 2-2 2 .92 1.22 2.49 2 4 2 2.21 0 4-1.79 4-4 0-1.66-1.34-3-3-3zm13.71-9.37l-1.34-1.34c-.39-.39-1.02-.39-1.41 0L9 12.25 11.75 15l8.96-8.96c.39-.39.39-1.02 0-1.41z"></path></svg>
-          </IconButton>
-        </Tooltip>
+
         <Tooltip title="Erase" placement="right">
           <IconButton className='earser'>
             <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" style={{'user-select': 'none'}}><path fill="none" d="M24 0v24H0V0h24z" style={{'user-select': 'none'}}></path><path d="M17.26 18l-2 2h6.7v-2h-4.7zm4.15-6.67L13.04 20H4.73l-2.15-2.14c-.78-.78-.78-2.03 0-2.82L13.62 3.58c.78-.77 2.06-.77 2.84 0l4.95 4.93c.79.78.79 2.04 0 2.82z" style={{'user-select': 'none'}}></path></svg>
@@ -95,42 +89,72 @@ const ToolBox = () => {
           </IconButton>
         </Tooltip>
 
+<Popover id={id} open={open} anchorEl={anchorEl} onClose={handleClose}
+  anchorOrigin={{    vertical: 'top', horizontal: 'right',  }}
+  transformOrigin={{    vertical: 'top', horizontal: 'left',  }}
+  sx={{
+  }}
+>
+  <Box sx={{
+    backgroundColor: '#eeeeee',
+    boxShadow: 8,
+    display: 'flex',
+    alignItems: 'flex-start',
+    flexDirection: 'column',
+    padding: '5px',
+    // borderRadius: 3,
+    // border: '1px solid #dadce0',
+  }}>
+    <Box sx={{  flexGrow: 1, py: "4px" }}>
+      <Tooltip title="Pen" placement="bottom">
+        <IconButton className="pen" component="div">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24"><path fill="none" d="M24 0v24H0V0h24z"></path><path d="M3 17.25V21h3.74l7.54-7.53-3.75-3.75L3 17.25zM18.37 3.3l2.34 2.33c.39.39.4 1.03.01 1.42l-5.37 5.36-3.76-3.76 2.53-2.53-.73-.73-5.66 5.66-1.4-1.4 6.37-6.36c.39-.39 1.04-.38 1.42.01l1.42 1.41 1.42-1.41c.38-.39 1.02-.39 1.41 0z"></path></svg>
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Marker" placement="bottom">
+        <IconButton className='marker' component="div">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0V0z"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M9.7 9.49l4.29 4.3-6.54 6.54-.72-.72-1.43 1.43c-.79.79-2.07.79-2.86 0s-.79-2.08 0-2.86l1.43-1.43-.72-.72L9.7 9.49zm11.56-5.8L19.8 2.22c-.78-.78-2.05-.78-2.83 0l-6.21 6.21 4.29 4.3 6.21-6.21c.79-.78.79-2.05 0-2.83z"></path></svg>
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Highligter" placement="bottom">
+        <IconButton className='highlighter' component="div">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0V0z"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M10.22 9.49l-5.91 6c-.77.8-.7 2.05.08 2.85L.77 22h5.68l.74-.75c.78.81 1.95.86 2.73.05l5.96-6.05-5.66-5.76zm12.46-4l-2.82-2.87c-.78-.8-2.07-.84-2.84-.04l-5.75 5.85 5.66 5.75 5.69-5.78c.77-.81.83-2.11.06-2.91z"></path></svg>
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Brush" placement="bottom">
+        <IconButton className='brush' component="div">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"></path><path d="M7 14c-1.66 0-3 1.34-3 3 0 1.31-1.16 2-2 2 .92 1.22 2.49 2 4 2 2.21 0 4-1.79 4-4 0-1.66-1.34-3-3-3zm13.71-9.37l-1.34-1.34c-.39-.39-1.02-.39-1.41 0L9 12.25 11.75 15l8.96-8.96c.39-.39.39-1.02 0-1.41z"></path></svg>
+        </IconButton>
+      </Tooltip>
+    </Box>
+    <Box sx={{  flexGrow: 1 }} >
+      <Tooltip title="Black" placement="bottom">
+        <IconButton component="div" sx={{ padding: "6px" }}><div className="color-picker-button color-swatch-black" style={{ backgroundColor: "#3c4043" }}></div></IconButton>
+      </Tooltip>
+      <Tooltip title="Blue" placement="bottom">
+        <IconButton component="div" sx={{ padding: "6px" }}><div className="color-picker-button color-swatch-blue" style={{ backgroundColor: "#19acc0" }}></div></IconButton>
+      </Tooltip>
+      <Tooltip title="Green" placement="bottom">
+        <IconButton component="div" sx={{ padding: "6px" }}><div className="color-picker-button color-swatch-green" style={{ backgroundColor: "#699e3e" }}></div></IconButton>
+      </Tooltip>
+    </Box>
+    <Box sx={{  flexGrow: 1 }} >
+      <Tooltip title="White" placement="bottom">
+        <IconButton component="div" sx={{ padding: "6px" }}><div className="color-picker-button color-swatch-white" style={{ backgroundColor: "white", border: '1px solid #dadce0' }}></div></IconButton>
+      </Tooltip>
+      <Tooltip title="Yellow" placement="bottom">
+        <IconButton component="div" sx={{ padding: "6px" }}><div className="color-picker-button color-swatch-yellow" style={{ backgroundColor: "#f3b32a" }}></div></IconButton>
+      </Tooltip>
+      <Tooltip title="Red" placement="bottom">
+        <IconButton component="div" sx={{ padding: "6px" }}><div className="color-picker-button color-swatch-red" style={{ backgroundColor: "#d9453c" }}></div></IconButton>
+      </Tooltip>
+    </Box>
+  </Box>
+</Popover>
 
 
       </ButtonGroup>
     </Toolbar>
-<Popper
-  placement="right-start"
-  disablePortal={false}
-  modifiers={[
-    {
-      name: 'flip',
-      enabled: true,
-      options: {
-        altBoundary: true,
-        rootBoundary: 'document',
-        padding: 8,
-      },
-    },
-    {
-      name: 'preventOverflow',
-      enabled: true,
-      options: {
-        altAxis: true,
-        altBoundary: true,
-        tether: true,
-        rootBoundary: 'document',
-        padding: 8,
-      },
-    },
-    {
-      name: 'arrow',
-      enabled: false,
-      options: {
-      },
-    },
-  ]}
-></Popper>
 
   </Container>
 
