@@ -15,20 +15,21 @@ Object.defineProperty(String.prototype, 'capitalize', {
 });
 
 const StyledIconButton = styled(IconButton, {
-  shouldForwardProp: (prop) => prop !== 'bgcol' && prop !== 'variant',
-})(({ bgcol, variant }) => ({
+  shouldForwardProp: (prop) => prop !== 'bgcol',
+})(({ bgcol}) => ({
   '&:hover': { color: 'black' },
   backgroundColor: bgcol,
 }))
 
 const ToolBox = () => {
-  const [penAnchorEl, setPenAnchorEl] = React.useState(null)
-  const [shapeAnchorEl, setShapeAnchorEl] = React.useState(null)
+  const [penAnchorEl, setPenAnchorEl] = useState(null)
+  const [shapeAnchorEl, setShapeAnchorEl] = useState(null)
   const [color, setColor] = useState('')
   const [bgColor, setBgColor] = useState('none')
   const [size, setSize] = useState(32)
   const [currentTool, setCurrentTool] = useState('pen')
   const [currentShape, setCurrentShape] = useState('circle')
+  const [select, setSelect] = useState(2)
 
   const onToolSelect = (e) => {
     console.log(e.currentTarget.attributes['tool'].value)
@@ -40,6 +41,10 @@ const ToolBox = () => {
     console.log(e.currentTarget.attributes['tool'].value)
     // setCurrentTool(null)
     setCurrentShape(e.currentTarget.attributes['tool'].value)
+  }
+
+  const handleSelect = (key) => {
+    setSelect(key)
   }
 
   const handlePenClick = (event) => {
@@ -61,7 +66,7 @@ const ToolBox = () => {
   const penOpen = Boolean(penAnchorEl)
   const shapeOpen = Boolean(shapeAnchorEl)
   const penPopoverId = penOpen ? 'simple-popover' : undefined
-  const shapesPopoverId = penOpen ? 'shapes-popover' : undefined
+  const shapesPopoverId = shapeOpen ? 'shapes-popover' : undefined
   
   const onColorChange = (e) => {
     // console.log(e.target.value)
@@ -122,7 +127,9 @@ const ToolBox = () => {
             </IconButton> */}
 
             <Tooltip title={currentTool.capitalize()} placement='right'>
-              <StyledIconButton bgcol={bgColor} aria-describedby={penPopoverId} variant="contained" onClick={handlePenClick} style={{border: currentTool && `2px solid ${color}`}} className="">
+              <StyledIconButton bgcol={bgColor} aria-describedby={penPopoverId} variant="contained" 
+                key={20} onClick={(e) => {handlePenClick(e); handleSelect(20)}} style={{ outline: select === 20 ? `2px solid ${color}` : '' }}
+              >
               {currentTool === 'pen' && <ToolBoxIcon.PenIcon width={size} height={size} inner={color}/>}
               {currentTool === 'marker' && <ToolBoxIcon.MarkerIcon width={size} height={size} inner={color} />}
               {currentTool === 'highlighter' && <ToolBoxIcon.HighlighterIcon width={size} height={size} inner={color} />}
@@ -131,23 +138,25 @@ const ToolBox = () => {
             </Tooltip>
 
             <Tooltip title="Erase" placement="right">
-              <StyledIconButton className="earser" >
+              <StyledIconButton className="earser" key={1} onClick={() => handleSelect(1)} style={{ outline: select === 1 ? `2px solid ${color}` : '' }}>
                 <ToolBoxIcon.EraserIcon width={size} height={size} />
               </StyledIconButton>
             </Tooltip>
 
             <Tooltip title="Select" placement="right">
-              <StyledIconButton className="selectorButton" >
+              <StyledIconButton className="selectorButton" key={2} onClick={() => handleSelect(2)} style={{ outline: select === 2 ? `2px solid ${color}` : '' }}>
                 <ToolBoxIcon.SelectorIcon width={size} height={size} />
               </StyledIconButton>
             </Tooltip>
             <Tooltip title="Sticky Note (Ctrl+Shift+P)" placement="right">
-              <StyledIconButton className="stickyNoteButton" >
+              <StyledIconButton className="stickyNoteButton" key={3} onClick={() => handleSelect(3)} style={{ outline: select === 3 ? `2px solid ${color}` : '' }}>
                 <ToolBoxIcon.StickyNoteIcon width={size} height={size} />
               </StyledIconButton>
             </Tooltip>
             <Tooltip title={currentShape.capitalize()} placement="right">
-              <StyledIconButton bgcol={bgColor} aria-describedby={shapesPopoverId} variant="contained" onClick={handleShapeClick} >
+              <StyledIconButton bgcol={bgColor} aria-describedby={shapesPopoverId} variant="contained"
+                key={12} onClick={(e) => {handleShapeClick(e); handleSelect(12)}} style={{ outline: select === 12 ? `2px solid ${color}` : '' }}
+              >
               {currentShape === 'circle' &&  <ToolBoxIcon.CircleIcon width={size} height={size} inner={color} />}
               {currentShape === 'square' && <ToolBoxIcon.SquareIcon width={size} height={size} inner={color} />}
               {currentShape === 'triangle' && <ToolBoxIcon.TriangleIcon width={size} height={size} inner={color} />}
@@ -160,17 +169,17 @@ const ToolBox = () => {
             </Tooltip>
 
             <Tooltip title="Add image" placement="right">
-              <StyledIconButton className="imageButton" >
+              <StyledIconButton className="imageButton" key={4} onClick={() => handleSelect(4)} style={{ outline: select === 4 ? `2px solid ${color}` : '' }}>
                 <ToolBoxIcon.ImageIcon width={size} height={size} />
               </StyledIconButton>
             </Tooltip>
             <Tooltip title="Text Box" placement="right">
-              <StyledIconButton className="textBoxButton" >
+              <StyledIconButton className="textBoxButton" key={5} onClick={() => handleSelect(5)} style={{ outline: select === 5 ? `2px solid ${color}` : '' }}>
                 <ToolBoxIcon.TextBoxIcon width={size} height={size} />
               </StyledIconButton>
             </Tooltip>
             <Tooltip title="Laser" placement="right">
-              <StyledIconButton className="laserButton" >
+              <StyledIconButton className="laserButton" key={6} onClick={() => handleSelect(6)} style={{ outline: select === 6 ? `2px solid ${color}` : '' }}>
                 <ToolBoxIcon.LaserIcon width={size} height={size} />
               </StyledIconButton>
             </Tooltip>
