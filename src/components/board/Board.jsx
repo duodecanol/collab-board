@@ -7,7 +7,7 @@ class Board extends React.Component
 {
 
   timeout;
-  socket = io.connect("http://localhost:5000", {
+  socket = io.connect("http://localhost:8899", {
     cors: {
       origin: "*",
     }
