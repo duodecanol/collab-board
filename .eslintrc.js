@@ -5,7 +5,11 @@ module.exports = {
         node: true,
         jest: true,
     },
-    extends: `plugin:react/recommended`,
+    extends: [
+        `eslint:recommended`,
+        `plugin:react/recommended`,
+        `plugin:react-hooks/recommended`,
+    ],
     parser: `@babel/eslint-parser`,
     parserOptions: {
         ecmaVersion: 2016,
@@ -13,14 +17,15 @@ module.exports = {
         ecmaFeatures: {
             jsx: true
         },
-        babelOptions: {
-            configFile: `./.babelrc.js`
-        }
+        requireConfigFile: false,
+        // babelOptions: {
+        //     // configFile: `./.babelrc.js`
+        // }
     },
     plugins: [
-        `prettier`
+        `jsx`
     ],
     rules: {
-        'prettier/prettier' : `warn`
+        "react/prop-types": 0
     }
-}
+};
