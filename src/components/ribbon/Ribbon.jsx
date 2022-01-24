@@ -71,7 +71,7 @@ const Ribbon = () => {
 
   return (
     <>
-      <Box position="absolute" className="ribbon" sx={{ flexGrow: 1, width: '100%' }}>
+      <Box position="relative" className="ribbon" sx={{ flexGrow: 1, width: '100%' }}>
         <AppBar position="static" className="header-bar" sx={{ bgcolor: '#888888' }}>
           <Container maxWidth="xl">
             <Toolbar disableGutters>
@@ -84,7 +84,7 @@ const Ribbon = () => {
 
               {/* Rename Button */}
               <Box sx={{ flexGrow: 0, marginRight: 3 }}>
-                <div class="jam-bar-rename-button" role="button" style={{ 'user-select': 'none' }} tabindex="0" aria-label="이름 변경">
+                <div className="jam-bar-rename-button" role="button" style={{ 'user-select': 'none' }} tabIndex="0" aria-label="이름 변경">
                   제목 없는 Jam
                 </div>
               </Box>
@@ -132,78 +132,78 @@ const Ribbon = () => {
               <Box sx={{ flexGrow: 1 }}></Box>
 
               <Box sx={{ flexGrow: 1 }}>
-                <div id="jam-bar-center-menu" class="jam-bar-menu jam-bar-center-menu">
-                  <div id="jam-collapsed-presence-bar" class="jam-collapsed-presence-bar" data-total-frames="1" data-active-frame-index="0" tabindex="0" style={{ 'user-select': 'none' }}>
+                <div id="jam-bar-center-menu" className="jam-bar-menu jam-bar-center-menu">
+                  <div id="jam-collapsed-presence-bar" className="jam-collapsed-presence-bar" data-total-frames="1" data-active-frame-index="0" tabIndex="0" style={{ 'user-select': 'none' }}>
                     <div
-                      class="prev-button jam-flatbutton-icon jam-flatbutton-disabled jam-flatbutton"
+                      className="prev-button jam-flatbutton-icon jam-flatbutton-disabled jam-flatbutton"
                       data-jamtooltip="이전 프레임"
                       data-tooltip="이전 프레임"
                       aria-label="이전 프레임"
-                      data-tooltip-class="jam-tooltip"
+                      data-tooltip-className="jam-tooltip"
                       role="button"
                       aria-disabled="true"
                       style={{ 'user-select': 'none' }}
                       id=":8"
                     >
-                      <div class="jam-flatbutton-overlay" style={{ 'border-radius': '50%', 'user-select': 'none' }}></div>
-                      <div class="jam-flatbutton-content" style={{ 'user-select': 'none' }}>
-                        <div class="jam-icon jam-icon-arrow-left-black" style={{ 'user-select': 'none' }}></div>
+                      <div className="jam-flatbutton-overlay" style={{ 'border-radius': '50%', 'user-select': 'none' }}></div>
+                      <div className="jam-flatbutton-content" style={{ 'user-select': 'none' }}>
+                        <div className="jam-icon jam-icon-arrow-left-black" style={{ 'user-select': 'none' }}></div>
                       </div>
                     </div>
                     <div
-                      class="expand-button jam-flatbutton"
+                      className="expand-button jam-flatbutton"
                       data-jamtooltip="프레임 바 펼치기"
                       data-tooltip="프레임 바 펼치기"
                       aria-label="프레임 바 펼치기"
-                      data-tooltip-class="jam-tooltip"
+                      data-tooltip-className="jam-tooltip"
                       role="button"
                       style={{ 'user-select': 'none' }}
                       id=":9"
                     >
-                      <div class="jam-flatbutton-overlay" style={{ 'border-radius': '4px', 'user-select': 'none' }}></div>
-                      <div class="jam-flatbutton-content" style={{ 'user-select': 'none' }}>
+                      <div className="jam-flatbutton-overlay" style={{ 'border-radius': '4px', 'user-select': 'none' }}></div>
+                      <div className="jam-flatbutton-content" style={{ 'user-select': 'none' }}>
                         <svg xmlns="http://www.w3.org/2000/svg" width="46" height="36" viewBox="0 0 46 36" style={{ 'user-select': 'none' }}>
                           <g fill="none" style={{ 'user-select': 'none' }}>
-                            <rect width="38" height="22" x="1" y="7" stroke="#3C4043" stroke-width="2" style={{ 'user-select': 'none' }}></rect>
+                            <rect width="38" height="22" x="1" y="7" stroke="#3C4043" strokeWidth="2" style={{ 'user-select': 'none' }}></rect>
                             <path fill="#5F6368" d="M8,4 L6,4 L6,0 L46,0 L46,24 L42,24 L42,22 L44,22 L44,2 L8,2 L8,4 Z" style={{ 'user-select': 'none' }}></path>
                             <polygon fill="#80868B" points="26 33 23 36 20 33" style={{ 'user-select': 'none' }}></polygon>
                           </g>
                         </svg>
                         {/* TODO: text useState */}
-                        {/* <div class="text" style={{'user-select': 'none'}}>1 / 1</div> */}
+                        {/* <div className="text" style={{'user-select': 'none'}}>1 / 1</div> */}
                       </div>
                     </div>
                     <div
-                      class="next-button jam-flatbutton-icon jam-flatbutton"
+                      className="next-button jam-flatbutton-icon jam-flatbutton"
                       data-jamtooltip="다음 프레임"
                       data-tooltip="다음 프레임"
                       aria-label="다음 프레임"
-                      data-tooltip-class="jam-tooltip"
+                      data-tooltip-className="jam-tooltip"
                       role="button"
                       style={{ 'user-select': 'none' }}
                       id=":a"
                       aria-disabled="false"
                     >
-                      <div class="jam-flatbutton-overlay" style={{ 'border-radius': '50%', 'user-select': 'none' }}></div>
-                      <div class="jam-flatbutton-content" style={{ 'user-select': 'none' }}>
-                        <div class="jam-icon jam-icon-arrow-right-black" style={{ 'user-select': 'none' }}></div>
+                      <div className="jam-flatbutton-overlay" style={{ 'border-radius': '50%', 'user-select': 'none' }}></div>
+                      <div className="jam-flatbutton-content" style={{ 'user-select': 'none' }}>
+                        <div className="jam-icon jam-icon-arrow-right-black" style={{ 'user-select': 'none' }}></div>
                       </div>
                     </div>
                     <div
-                      class="create-button jam-flatbutton-icon jam-flatbutton"
+                      className="create-button jam-flatbutton-icon jam-flatbutton"
                       data-jamtooltip="프레임 만들기"
                       data-tooltip="프레임 만들기"
                       aria-label="프레임 만들기"
-                      data-tooltip-class="jam-tooltip"
+                      data-tooltip-className="jam-tooltip"
                       role="button"
                       style={{ 'user-select': 'none', display: 'none' }}
                       id=":b"
                       aria-disabled="false"
                       aria-hidden="true"
                     >
-                      <div class="jam-flatbutton-overlay" style={{ 'border-radius': '50%', 'user-select': 'none' }}></div>
-                      <div class="jam-flatbutton-content" style={{ 'user-select': 'none' }}>
-                        <div class="jam-icon jam-icon-arrow-right-black" style={{ 'user-select': 'none' }}></div>
+                      <div className="jam-flatbutton-overlay" style={{ 'border-radius': '50%', 'user-select': 'none' }}></div>
+                      <div className="jam-flatbutton-content" style={{ 'user-select': 'none' }}>
+                        <div className="jam-icon jam-icon-arrow-right-black" style={{ 'user-select': 'none' }}></div>
                       </div>
                     </div>
                   </div>

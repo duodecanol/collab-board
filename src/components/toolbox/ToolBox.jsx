@@ -134,7 +134,6 @@ const ToolBox = () => {
                 <ToolBoxIcon.EraserIcon width={size} height={size} inner={select === 1 ? '#eeeeee' : '#333'} />
               </StyledIconButton>
             </Tooltip>
-
             <Tooltip title="Select" placement="right">
               <StyledIconButton className="selectorButton" key={2} onClick={() => handleSelect(2)} style={{ backgroundColor: select === 2 ? '#333' : 'transparent' }}>
                 <ToolBoxIcon.SelectorIcon width={size} height={size} inner={select === 2 ? '#eeeeee' : '#333'} />
