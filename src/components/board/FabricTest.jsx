@@ -5,6 +5,7 @@ import { fabric } from 'fabric'
 const FabricTest = () => {
   const [canvas, setCanvas] = useState(null)
   const [imgURL, setImgURL] = useState('')
+  const [zoom, setZoom] = useState() // object{zoom double, fixed boolean}
   const winSize = useWindowSize()
   const brushColor = 'hotpink';
   const brushSize = 30;
@@ -15,12 +16,14 @@ const FabricTest = () => {
   }, [])
 
   useEffect(() => {
-    console.log(winSize)
+    console.log('winsize', JSON.stringify(winSize))
     if (canvas) {
-      let scaleRatio = Math.min(winSize.width / canvas.getWidth(), (winSize.height - 250) / canvas.getHeight())
+      console.log('canvasSize', `width: ${canvas.getWidth()}, height: ${canvas.getHeight()}`)
+      let scaleRatio = Math.min(winSize.width / canvas.getWidth(), (winSize.height - 200) / canvas.getHeight())
       canvas.setDimensions({ width: canvas.getWidth() * scaleRatio, height: canvas.getHeight() * scaleRatio })
       canvas.setZoom(canvas.getZoom() * scaleRatio)
-    }    
+      setZoom(canvas.getZoom())
+    }
     // setCanvas(icanvas)
   }, [canvas, winSize])
 
@@ -130,15 +133,16 @@ const FabricTest = () => {
           {winSize.width}px / {winSize.height}px
         </span>
         <button onClick={()=>{
-          console.log(canvas.getZoom())
           canvas.setZoom(canvas.getZoom() / 1.1)
           canvas.setDimensions({ width: canvas.getWidth() / 1.1, height: canvas.getHeight() / 1.1 })
-        }}> -</button>
+          setZoom(canvas.getZoom())
+        }}>[ - ]</button>
         <button onClick={()=>{
-          console.log(canvas.getZoom())
           canvas.setZoom(canvas.getZoom() * 1.1)
           canvas.setDimensions({ width: canvas.getWidth() * 1.1, height: canvas.getHeight() * 1.1 })
-        }}>+</button>
+          setZoom(canvas.getZoom())
+        }}>[+]</button>
+        <span>zoom: {(zoom * 100).toFixed(3)}</span>
         <form onSubmit={(e) => addImg(e, imgURL, canvas)}>
           <div>
             <input
@@ -151,8 +155,7 @@ const FabricTest = () => {
         </form>
 
       </div>
-      <div className="canvas-container" style={{display: 'flex', alignItems: "center", justifyContent: 'center',
-        marginLeft: '50px', marginRight: '50px', marginBottom: '10px', marginTop: 0}}>
+      <div className="background" >
         <canvas id="canvas" />
       </div>
     </>

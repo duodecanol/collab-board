@@ -8,3 +8,22 @@
     width: 100%;
     height: 100%;
 }
+
+.background {
+    min-height: 85vh;
+    margin: 0;
+    position: relative;
+    float: none;
+    margin: 0 auto;
+    border: solid rgb(162, 36, 167) 3px;
+    width: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.button-set {
+    position: absolute;
+    z-index: 99;
+}
