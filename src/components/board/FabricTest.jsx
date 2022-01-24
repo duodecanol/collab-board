@@ -1,7 +1,5 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useLayoutEffect, useEffect } from 'react'
 import { fabric } from 'fabric'
-
-import DeleteIcon from '@mui/icons-material/Delete'
 
 
 const FabricTest = () => {
@@ -11,14 +9,29 @@ const FabricTest = () => {
   const brushColor = 'hotpink';
   const brushSize = 30;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    console.log('load canvas')
     setCanvas(initCanvas())
   }, [])
 
+  useEffect(() => {
+    console.log(winSize)
+    if (canvas) {
+      let scaleRatio = Math.min(winSize.width / canvas.getWidth(), (winSize.height - 250) / canvas.getHeight())
+      canvas.setDimensions({ width: canvas.getWidth() * scaleRatio, height: canvas.getHeight() * scaleRatio })
+      canvas.setZoom(canvas.getZoom() * scaleRatio)
+    }    
+    // setCanvas(icanvas)
+  }, [canvas, winSize])
+
   const initCanvas = () => {
+    console.log('init')
     return new fabric.Canvas('canvas', {
-      width: window.innerWidth - 100,
-      height: window.innerHeight - 250,
+      // width: window.innerWidth - 100,
+      // height: window.innerHeight - 250,
+      width: 1920,
+      height: 1080,
+      zoom: 100,
       backgroundColor: 'pink',
       defaultCursor: 'pointer',
     })
@@ -70,6 +83,30 @@ const FabricTest = () => {
     return `data:image/svg+xml;base64,${ window.btoa(circle) }`
   }
 
+  function toggleDrawingMode() {
+    if (canvas.isDrawingMode) {
+        canvas.isDrawingMode = false // drawing mode off
+        canvas.freeDrawingCursor = 'default' // may be useless
+    } else {
+      canvas.isDrawingMode = true
+      // console.log(canvas.freeDrawingBrush.color)
+      // console.log(canvas.freeDrawingBrush.width)
+      // set initial brush size
+      canvas.freeDrawingBrush.color = brushColor
+      canvas.freeDrawingBrush.width = brushSize
+      // canvas.freeDrawingCursor = 'none' // invisible cursor
+      canvas.freeDrawingCursor = `url(${ getDrawCursor(brushSize, brushColor, 1) }) ${ brushSize / 2 } ${ brushSize / 2 }, crosshair`
+      canvas.on('mouse:down', event => {
+        // set cursor down mode with high transparency
+        canvas.freeDrawingCursor = `url(${ getDrawCursor(brushSize, brushColor, 0.2) }) ${ brushSize / 2 } ${ brushSize / 2 }, crosshair`
+      })
+      canvas.on('mouse:up', event => {
+        // set cursor up mode with high opacity
+        canvas.freeDrawingCursor = `url(${ getDrawCursor(brushSize, brushColor, 0.8) }) ${ brushSize / 2 } ${ brushSize / 2 }, crosshair`
+      })
+    }
+  }
+
   return (
     <>
       <div className="button-set">
@@ -84,36 +121,24 @@ const FabricTest = () => {
         </button>
         <button
           onClick={() => {
-            if (canvas.isDrawingMode) {
-              canvas.isDrawingMode = false
-              canvas.freeDrawingCursor = 'default'
-            } else {
-              canvas.isDrawingMode = true
-              console.log(canvas.freeDrawingBrush.color)
-              console.log(canvas.freeDrawingBrush.width)
-              canvas.freeDrawingBrush.color = brushColor
-              canvas.freeDrawingBrush.width = brushSize
-              canvas.freeDrawingCursor = 'none'
-              const mousecursor = new fabric.Circle({
-                left: 0,
-                top: 0,
-                radius: canvas.freeDrawingBrush.width / 2,
-                fill: canvas.freeDrawingBrush.color,
-                originX: 'right',
-                originY: 'bottom',
-              });
-              canvas.freeDrawingCursor = `url(${ getDrawCursor(brushSize, brushColor, 1) }) ${ brushSize / 2 } ${ brushSize / 2 }, crosshair`
-              canvas.on('mouse:down', event => {
-                canvas.freeDrawingCursor = `url(${ getDrawCursor(brushSize, brushColor, 0.2) }) ${ brushSize / 2 } ${ brushSize / 2 }, crosshair`
-              });
-              canvas.on('mouse:up', event => {
-                canvas.freeDrawingCursor = `url(${ getDrawCursor(brushSize, brushColor, 0.8) }) ${ brushSize / 2 } ${ brushSize / 2 }, crosshair`
-              });
-            }
+            toggleDrawingMode()
           }}
         >
           Drawing Mode
         </button>
+        <span>
+          {winSize.width}px / {winSize.height}px
+        </span>
+        <button onClick={()=>{
+          console.log(canvas.getZoom())
+          canvas.setZoom(canvas.getZoom() / 1.1)
+          canvas.setDimensions({ width: canvas.getWidth() / 1.1, height: canvas.getHeight() / 1.1 })
+        }}> -</button>
+        <button onClick={()=>{
+          console.log(canvas.getZoom())
+          canvas.setZoom(canvas.getZoom() * 1.1)
+          canvas.setDimensions({ width: canvas.getWidth() * 1.1, height: canvas.getHeight() * 1.1 })
+        }}>+</button>
         <form onSubmit={(e) => addImg(e, imgURL, canvas)}>
           <div>
             <input
@@ -124,11 +149,10 @@ const FabricTest = () => {
             <button type="submit">Add Image</button>
           </div>
         </form>
-        <div>
-          {winSize.width}px / {winSize.height}px
-        </div>
+
       </div>
-      <div className="canvas-container" style={{display: 'flex', alignItems: "center", justifyContent: 'center'}}>
+      <div className="canvas-container" style={{display: 'flex', alignItems: "center", justifyContent: 'center',
+        marginLeft: '50px', marginRight: '50px', marginBottom: '10px', marginTop: 0}}>
         <canvas id="canvas" />
       </div>
     </>
