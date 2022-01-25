@@ -1,14 +1,16 @@
 import React, { useState, useLayoutEffect, useEffect } from 'react'
 import { fabric } from 'fabric'
 
-
 const FabricTest = () => {
   const [canvas, setCanvas] = useState(null)
   const [imgURL, setImgURL] = useState('')
   const [zoom, setZoom] = useState() // object{zoom double, fixed boolean}
+  const [operation, setOperation] = useState(null) // object{zoom double, fixed boolean}
+  const [undo, setUndo] = useState([])
+  const [redo, setRedo] = useState([])
   const winSize = useWindowSize()
-  const brushColor = 'hotpink';
-  const brushSize = 30;
+  const brushColor = 'hotpink'
+  const brushSize = 30
 
   useLayoutEffect(() => {
     console.log('load canvas')
@@ -29,7 +31,7 @@ const FabricTest = () => {
 
   const initCanvas = () => {
     console.log('init')
-    return new fabric.Canvas('canvas', {
+    let canvas = new fabric.Canvas('canvas', {
       // width: window.innerWidth - 100,
       // height: window.innerHeight - 250,
       width: 1920,
@@ -38,6 +40,14 @@ const FabricTest = () => {
       backgroundColor: 'pink',
       defaultCursor: 'pointer',
     })
+
+    canvas.on('path:created', (event) => {
+      console.log(event)
+    })
+    canvas.on('object:modified', (event) => {
+      console.log(event)
+    })
+    return canvas
   }
 
   const addRect = (canvi) => {
@@ -65,31 +75,43 @@ const FabricTest = () => {
   function getDrawCursor(brushSize, brushColor, opacity) {
     const circle = `
       <svg
-        height="${ brushSize }"			
-        viewBox="0 0 ${ brushSize * 2 } ${ brushSize * 2 }"
-        width="${ brushSize }"
+        height="${brushSize}"
+        viewBox="0 0 ${brushSize * 2} ${brushSize * 2}"
+        width="${brushSize}"
         xmlns="http://www.w3.org/2000/svg" version="1.1"
       >
         <circle
           onmouse="mouse_move(e)"
-          opacity="${ opacity }"
-          fill="${ brushColor }"
+          opacity="${opacity}"
+          fill="${brushColor}"
           stroke="rgba(134, 136, 134, 0.8)"
           stroke-width="2"
           cx="50%"
           cy="50%"
-          r="${ brushSize }" 
+          r="${brushSize}"
         />
       </svg>
     `
-    
-    return `data:image/svg+xml;base64,${ window.btoa(circle) }`
+
+    return `data:image/svg+xml;base64,${window.btoa(circle)}`
+  }
+
+  const save = () => {
+    setRedo([])
+    if (operation) {
+      undo.push(operation)
+    }
+    console.log(operation)
   }
 
   function toggleDrawingMode() {
     if (canvas.isDrawingMode) {
-        canvas.isDrawingMode = false // drawing mode off
-        canvas.freeDrawingCursor = 'default' // may be useless
+      canvas.isDrawingMode = false // drawing mode off
+      canvas.freeDrawingCursor = 'default' // may be useless
+      // revoke event listener
+      // https://stackoverflow.com/questions/18737058/how-to-remove-event-listener-from-fabricjs-canvas
+      canvas.off('mouse:down')
+      canvas.off('mouse:up')
     } else {
       canvas.isDrawingMode = true
       // console.log(canvas.freeDrawingBrush.color)
@@ -98,14 +120,19 @@ const FabricTest = () => {
       canvas.freeDrawingBrush.color = brushColor
       canvas.freeDrawingBrush.width = brushSize
       // canvas.freeDrawingCursor = 'none' // invisible cursor
-      canvas.freeDrawingCursor = `url(${ getDrawCursor(brushSize, brushColor, 1) }) ${ brushSize / 2 } ${ brushSize / 2 }, crosshair`
-      canvas.on('mouse:down', event => {
+      canvas.freeDrawingCursor = `url(${getDrawCursor(brushSize, brushColor, 1)}) ${brushSize / 2} ${brushSize / 2}, crosshair`
+      canvas.on('mouse:down', (event) => {
         // set cursor down mode with high transparency
-        canvas.freeDrawingCursor = `url(${ getDrawCursor(brushSize, brushColor, 0.2) }) ${ brushSize / 2 } ${ brushSize / 2 }, crosshair`
+        canvas.freeDrawingCursor = `url(${getDrawCursor(brushSize, brushColor, 0.2)}) ${brushSize / 2} ${brushSize / 2}, crosshair`
       })
-      canvas.on('mouse:up', event => {
+      canvas.on('mouse:up', (event) => {
         // set cursor up mode with high opacity
-        canvas.freeDrawingCursor = `url(${ getDrawCursor(brushSize, brushColor, 0.8) }) ${ brushSize / 2 } ${ brushSize / 2 }, crosshair`
+        canvas.freeDrawingCursor = `url(${getDrawCursor(brushSize, brushColor, 0.8)}) ${brushSize / 2} ${brushSize / 2}, crosshair`
+        console.log(event)
+        console.log(event.e)
+        console.log()
+        // append operation to undo array
+        setUndo((undo) => [...undo, event.currentTarget])
       })
     }
   }
@@ -113,6 +140,33 @@ const FabricTest = () => {
   return (
     <>
       <div className="button-set">
+        <button
+          id="undo"
+          onClick={() => {
+            // UNDO operation
+            console.log('undo', undo)
+            // let object = canvas.item(canvas.getObjects().length - 1)
+            let object = undo.pop()
+            setRedo((redo) => [...redo, object])
+            canvas.remove(object)
+          }}
+          disabled={undo.length === 0}
+        >
+          Undo
+        </button>
+        <button
+          id="redo"
+          onClick={() => {
+            // REDO operation
+            console.log('redo', redo)
+            let object = redo.pop()
+            setUndo((undo) => [...undo, object])
+            canvas.add(object)
+          }}
+          disabled={redo.length === 0}
+        >
+          Redo
+        </button>
         <button onClick={() => addRect(canvas)}>Rectangle</button>
         <button
           onClick={(e) => {
@@ -132,30 +186,33 @@ const FabricTest = () => {
         <span>
           {winSize.width}px / {winSize.height}px
         </span>
-        <button onClick={()=>{
-          canvas.setZoom(canvas.getZoom() / 1.1)
-          canvas.setDimensions({ width: canvas.getWidth() / 1.1, height: canvas.getHeight() / 1.1 })
-          setZoom(canvas.getZoom())
-        }}>[ - ]</button>
-        <button onClick={()=>{
-          canvas.setZoom(canvas.getZoom() * 1.1)
-          canvas.setDimensions({ width: canvas.getWidth() * 1.1, height: canvas.getHeight() * 1.1 })
-          setZoom(canvas.getZoom())
-        }}>[+]</button>
+        <button
+          onClick={() => {
+            canvas.setZoom(canvas.getZoom() / 1.1)
+            canvas.setDimensions({ width: canvas.getWidth() / 1.1, height: canvas.getHeight() / 1.1 })
+            setZoom(canvas.getZoom())
+          }}
+        >
+          [ - ]
+        </button>
+        <button
+          onClick={() => {
+            canvas.setZoom(canvas.getZoom() * 1.1)
+            canvas.setDimensions({ width: canvas.getWidth() * 1.1, height: canvas.getHeight() * 1.1 })
+            setZoom(canvas.getZoom())
+          }}
+        >
+          [+]
+        </button>
         <span>zoom: {(zoom * 100).toFixed(3)}</span>
         <form onSubmit={(e) => addImg(e, imgURL, canvas)}>
           <div>
-            <input
-              type="text"
-              value={imgURL}
-              onChange={(e) => setImgURL(e.target.value)}
-            />
+            <input type="text" value={imgURL} onChange={(e) => setImgURL(e.target.value)} />
             <button type="submit">Add Image</button>
           </div>
         </form>
-
       </div>
-      <div className="background" >
+      <div className="background">
         <canvas id="canvas" />
       </div>
     </>
@@ -169,7 +226,7 @@ const useWindowSize = () => {
   const [windowSize, setWindowSize] = useState({
     width: undefined,
     height: undefined,
-  });
+  })
   useEffect(() => {
     // Handler to call on window resize
     function handleResize() {
@@ -177,17 +234,16 @@ const useWindowSize = () => {
       setWindowSize({
         width: window.innerWidth,
         height: window.innerHeight,
-      });
+      })
     }
     // Add event listener
-    window.addEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize)
     // Call handler right away so state gets updated with initial window size
-    handleResize();
+    handleResize()
     // Remove event listener on cleanup
-    return () => window.removeEventListener("resize", handleResize);
-  }, []); // Empty array ensures that effect is only run on mount
-  return windowSize;
+    return () => window.removeEventListener('resize', handleResize)
+  }, []) // Empty array ensures that effect is only run on mount
+  return windowSize
 }
-
 
 export default FabricTest
