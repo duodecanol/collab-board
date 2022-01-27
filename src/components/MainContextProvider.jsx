@@ -20,7 +20,7 @@ export function MainContextProvider({ children }) {
   const [undo, setUndo] = useState([]) //TODO: implement Polygon Undo
   const [redo, setRedo] = useState([])
   // TOOLBOX
-  const [colorPicked, setColorPicked] = useState(`rgb(0, 0, 0)`)
+  const [colorPicked, setColorPicked] = useState('#222121')
   const [brushSize, setBrushSize] = useState(10)
   const [eraserSize, setEraserSize] = useState(10)
   const [currentTool, setCurrentTool] = useState(ToolsEnum.SELECT)

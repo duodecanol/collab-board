@@ -22,6 +22,7 @@ const StyledIconButton = styled(IconButton, {
 }))
 
 const ToolBox = () => {
+  const { canvas, setCanvas } = useContext(MainContext)
   const { colorPicked, setColorPicked } = useContext(MainContext)
   const { brushSize, setBrushSize } = useContext(MainContext)
   const { eraserSize, setEraserSize } = useContext(MainContext)
@@ -31,23 +32,24 @@ const ToolBox = () => {
 
   const [penAnchorEl, setPenAnchorEl] = useState(null)
   const [shapeAnchorEl, setShapeAnchorEl] = useState(null)
+  const [fgColor, setFgColor] = useState(colorPicked)
   const [bgColor, setBgColor] = useState('none')
 
   const ICONSIZE = 30
 
-  const onToolSelect = (e) => {
+  const onPenModeSelect = (e) => {
     console.log(e.currentTarget.attributes['tool'].value)
     // setCurrentShape(null)
     setPenMode(e.currentTarget.attributes['tool'].value)
   }
 
-  const onShapeSelect = (e) => {
+  const onShapeKindSelect = (e) => {
     console.log(e.currentTarget.attributes['tool'].value)
     // setCurrentTool(null)
     setShapeKind(e.currentTarget.attributes['tool'].value)
   }
 
-  const handleSelect = (key) => {
+  const handleToolSelect = (key) => {
     setCurrentTool(key)
   }
 
@@ -77,6 +79,7 @@ const ToolBox = () => {
     if (e.target.value.indexOf('#') !== 0 && e.target.value.length !== 7) {
       throw Error('Not an Hex rgb. Must be "#0099FF" pattern')
     }
+    setColorPicked(e.target.value) // set picked color
     let hexRgb = e.target.value.replace('#', '')
     let r = parseInt(hexRgb.slice(0, 2), 16),
       g = parseInt(hexRgb.slice(2, 4), 16),
@@ -85,14 +88,14 @@ const ToolBox = () => {
     // console.log(r, g, b)
     if (r > 200 && g > 200 && b > 200) {
       if (r > 230 && g > 230 && b > 230) {
-        setColorPicked('#111111')
+        setFgColor('#111111')
         setBgColor(e.target.value)
       } else {
-        setColorPicked('#eeeeee')
+        setFgColor('#eeeeee')
         setBgColor(e.target.value)
       }
     } else {
-      setColorPicked(e.target.value)
+      setFgColor(e.target.value)
       setBgColor('#eeeeee')
     }
   }
@@ -121,51 +124,66 @@ const ToolBox = () => {
       <Container fixed disableGutters>
         <Toolbar disableGutters>
           <ButtonGroup orientation="vertical">
-            <Tooltip title={penMode.capitalize()} placement="right">
+            <Tooltip title={penMode && penMode.capitalize()} placement="right">
               <StyledIconButton
-                bgcol={currentTool === 20 ? colorPicked : bgColor}
+                bgcol={currentTool === ToolsEnum.FREE_DRAWING ? fgColor : bgColor}
                 aria-describedby={penPopoverId}
                 variant="contained"
-                key={20}
+                key={ToolsEnum.FREE_DRAWING}
                 onClick={(e) => {
                   handlePenClick(e)
-                  handleSelect(20)
+                  handleToolSelect(ToolsEnum.FREE_DRAWING)
                 }}
-                style={{ outline: currentTool === 20 ? `2px solid ${colorPicked}` : '' }}
+                style={{ outline: currentTool === ToolsEnum.FREE_DRAWING ? `2px solid ${fgColor}` : '' }}
               >
-                {penMode === 'pen' && <ToolBoxIcon.PenIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === 20 ? '#eeeeee' : colorPicked} />}
-                {penMode === 'marker' && <ToolBoxIcon.MarkerIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === 20 ? '#eeeeee' : colorPicked} />}
-                {penMode === 'highlighter' && <ToolBoxIcon.HighlighterIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === 20 ? '#eeeeee' : colorPicked} />}
-                {penMode === 'brush' && <ToolBoxIcon.BrushIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === 20 ? '#eeeeee' : colorPicked} />}
+                {penMode === 'pen' && <ToolBoxIcon.PenIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === ToolsEnum.FREE_DRAWING ? '#eeeeee' : fgColor} />}
+                {penMode === 'marker' && <ToolBoxIcon.MarkerIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === ToolsEnum.FREE_DRAWING ? '#eeeeee' : fgColor} />}
+                {penMode === 'highlighter' && <ToolBoxIcon.HighlighterIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === ToolsEnum.FREE_DRAWING ? '#eeeeee' : fgColor} />}
+                {penMode === 'brush' && <ToolBoxIcon.BrushIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === ToolsEnum.FREE_DRAWING ? '#eeeeee' : fgColor} />}
               </StyledIconButton>
             </Tooltip>
 
             <Tooltip title="Erase" placement="right">
-              <StyledIconButton className="earser" key={1} onClick={() => handleSelect(1)} style={{ backgroundColor: currentTool === 1 ? '#333' : 'transparent' }}>
-                <ToolBoxIcon.EraserIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === 1 ? '#eeeeee' : '#333'} />
+              <StyledIconButton
+                className="earser"
+                key={ToolsEnum.ERASER}
+                onClick={() => handleToolSelect(ToolsEnum.ERASER)}
+                style={{ backgroundColor: currentTool === ToolsEnum.ERASER ? '#333' : 'transparent' }}
+              >
+                <ToolBoxIcon.EraserIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === ToolsEnum.ERASER ? '#eeeeee' : '#333'} />
               </StyledIconButton>
             </Tooltip>
             <Tooltip title="Select" placement="right">
-              <StyledIconButton className="selectorButton" key={2} onClick={() => handleSelect(2)} style={{ backgroundColor: currentTool === 2 ? '#333' : 'transparent' }}>
-                <ToolBoxIcon.SelectorIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === 2 ? '#eeeeee' : '#333'} />
+              <StyledIconButton
+                className="selectorButton"
+                key={ToolsEnum.SELECT}
+                onClick={() => handleToolSelect(ToolsEnum.SELECT)}
+                style={{ backgroundColor: currentTool === ToolsEnum.SELECT ? '#333' : 'transparent' }}
+              >
+                <ToolBoxIcon.SelectorIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === ToolsEnum.SELECT ? '#eeeeee' : '#333'} />
               </StyledIconButton>
             </Tooltip>
             <Tooltip title="Sticky Note (Ctrl+Shift+P)" placement="right">
-              <StyledIconButton className="stickyNoteButton" key={3} onClick={() => handleSelect(3)} style={{ backgroundColor: currentTool === 3 ? '#333' : 'transparent' }}>
-                <ToolBoxIcon.StickyNoteIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === 3 ? '#eeeeee' : '#333'} />
+              <StyledIconButton
+                className="stickyNoteButton"
+                key={ToolsEnum.STICKY_NOTE}
+                onClick={() => handleToolSelect(ToolsEnum.STICKY_NOTE)}
+                style={{ backgroundColor: currentTool === ToolsEnum.STICKY_NOTE ? '#333' : 'transparent' }}
+              >
+                <ToolBoxIcon.StickyNoteIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === ToolsEnum.STICKY_NOTE ? '#eeeeee' : '#333'} />
               </StyledIconButton>
             </Tooltip>
-            <Tooltip title={shapeKind.capitalize()} placement="right">
+            <Tooltip title={shapeKind && shapeKind.capitalize()} placement="right">
               <StyledIconButton
                 bgcol={bgColor}
                 aria-describedby={shapesPopoverId}
                 variant="contained"
-                key={12}
+                key={ToolsEnum.SHAPES_DRAWING}
                 onClick={(e) => {
                   handleShapeClick(e)
-                  handleSelect(12)
+                  handleToolSelect(ToolsEnum.SHAPES_DRAWING)
                 }}
-                style={{ outline: currentTool === 12 ? `2px solid ${colorPicked}` : '' }}
+                style={{ outline: currentTool === ToolsEnum.SHAPES_DRAWING ? `2px solid ${fgColor}` : '' }}
               >
                 {shapeKind === 'circle' && <ToolBoxIcon.CircleIcon width={ICONSIZE} height={ICONSIZE} inner={'#333'} />}
                 {shapeKind === 'square' && <ToolBoxIcon.SquareIcon width={ICONSIZE} height={ICONSIZE} inner={'#333'} />}
@@ -179,18 +197,33 @@ const ToolBox = () => {
             </Tooltip>
 
             <Tooltip title="Add image" placement="right">
-              <StyledIconButton className="imageButton" key={4} onClick={() => handleSelect(4)} style={{ backgroundColor: currentTool === 4 ? '#333' : 'transparent' }}>
-                <ToolBoxIcon.ImageIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === 4 ? '#eeeeee' : '#333'} />
+              <StyledIconButton
+                className="imageButton"
+                key={ToolsEnum.IMAGE}
+                onClick={() => handleToolSelect(ToolsEnum.IMAGE)}
+                style={{ backgroundColor: currentTool === ToolsEnum.IMAGE ? '#333' : 'transparent' }}
+              >
+                <ToolBoxIcon.ImageIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === ToolsEnum.IMAGE ? '#eeeeee' : '#333'} />
               </StyledIconButton>
             </Tooltip>
             <Tooltip title="Text Box" placement="right">
-              <StyledIconButton className="textBoxButton" key={5} onClick={() => handleSelect(5)} style={{ backgroundColor: currentTool === 5 ? '#333' : 'transparent' }}>
-                <ToolBoxIcon.TextBoxIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === 5 ? '#eeeeee' : '#333'} />
+              <StyledIconButton
+                className="textBoxButton"
+                key={ToolsEnum.TEXTBOX}
+                onClick={() => handleToolSelect(ToolsEnum.TEXTBOX)}
+                style={{ backgroundColor: currentTool === ToolsEnum.TEXTBOX ? '#333' : 'transparent' }}
+              >
+                <ToolBoxIcon.TextBoxIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === ToolsEnum.TEXTBOX ? '#eeeeee' : '#333'} />
               </StyledIconButton>
             </Tooltip>
             <Tooltip title="Laser" placement="right">
-              <StyledIconButton className="laserButton" key={6} onClick={() => handleSelect(6)} style={{ backgroundColor: currentTool === 6 ? 'rgb(219,68,55)' : '#eeeeee' }}>
-                <ToolBoxIcon.LaserIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === 6 ? 'white' : '#333'} />
+              <StyledIconButton
+                className="laserButton"
+                key={ToolsEnum.LASER}
+                onClick={() => handleToolSelect(ToolsEnum.LASER)}
+                style={{ backgroundColor: currentTool === ToolsEnum.LASER ? 'rgb(219,68,55)' : '#eeeeee' }}
+              >
+                <ToolBoxIcon.LaserIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === ToolsEnum.LASER ? 'white' : '#333'} />
               </StyledIconButton>
             </Tooltip>
 
@@ -218,72 +251,110 @@ const ToolBox = () => {
               >
                 <Box sx={{ flexGrow: 1, py: '4px' }} id="palette-table">
                   <Tooltip title="Pen" placement="bottom">
-                    <StyledIconButton bgcol={bgColor} onClick={onToolSelect} tool="pen">
-                      <ToolBoxIcon.PenIcon width={ICONSIZE} height={ICONSIZE} inner={colorPicked} />
+                    <StyledIconButton bgcol={bgColor} onClick={onPenModeSelect} tool="pen">
+                      <ToolBoxIcon.PenIcon width={ICONSIZE} height={ICONSIZE} inner={fgColor} />
                     </StyledIconButton>
                   </Tooltip>
                   <Tooltip title="Marker" placement="bottom">
-                    <StyledIconButton bgcol={bgColor} onClick={onToolSelect} tool="marker">
-                      <ToolBoxIcon.MarkerIcon width={ICONSIZE} height={ICONSIZE} inner={colorPicked} />
+                    <StyledIconButton bgcol={bgColor} onClick={onPenModeSelect} tool="marker">
+                      <ToolBoxIcon.MarkerIcon width={ICONSIZE} height={ICONSIZE} inner={fgColor} />
                     </StyledIconButton>
                   </Tooltip>
                   <Tooltip title="Highligter" placement="bottom">
-                    <StyledIconButton bgcol={bgColor} onClick={onToolSelect} tool="highlighter">
-                      <ToolBoxIcon.HighlighterIcon width={ICONSIZE} height={ICONSIZE} inner={colorPicked} />
+                    <StyledIconButton bgcol={bgColor} onClick={onPenModeSelect} tool="highlighter">
+                      <ToolBoxIcon.HighlighterIcon width={ICONSIZE} height={ICONSIZE} inner={fgColor} />
                     </StyledIconButton>
                   </Tooltip>
                   <Tooltip title="Brush" placement="bottom">
-                    <StyledIconButton bgcol={bgColor} onClick={onToolSelect} tool="brush">
-                      <ToolBoxIcon.BrushIcon width={ICONSIZE} height={ICONSIZE} inner={colorPicked} />
+                    <StyledIconButton bgcol={bgColor} onClick={onPenModeSelect} tool="brush">
+                      <ToolBoxIcon.BrushIcon width={ICONSIZE} height={ICONSIZE} inner={fgColor} />
                     </StyledIconButton>
                   </Tooltip>
                 </Box>
-                <Box sx={{ flexGrow: 1 }}>
-                  <Tooltip title="Black" placement="bottom">
-                    <IconButton component="div" sx={{ padding: '6px' }}>
-                      <div className="color-picker-button color-swatch-black" style={{ backgroundColor: '#3c4043' }}></div>
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Blue" placement="bottom">
-                    <IconButton component="div" sx={{ padding: '6px' }}>
-                      <div className="color-picker-button color-swatch-blue" style={{ backgroundColor: '#19acc0' }}></div>
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Green" placement="bottom">
-                    <IconButton component="div" sx={{ padding: '6px' }}>
-                      <div className="color-picker-button color-swatch-green" style={{ backgroundColor: '#699e3e' }}></div>
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Color Picker" placement="bottom">
-                    <div style={{ width: '30px', height: '30px', borderRadius: '20px', overflow: 'hidden', display: 'inline-block', verticalAlign: 'bottom' }}>
-                      <input
-                        type="color"
-                        value={colorPicked}
-                        onChange={(e) => {
-                          onColorChange(e)
-                        }}
-                        style={{ border: 0, padding: 0, width: '150%', height: '150%', cursor: 'pointer', transform: 'translate(-25%, -25%)' }}
-                      />
-                    </div>
-                  </Tooltip>
-                </Box>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    flexDirection: 'row',
+                  }}
+                >
+                  <Box>
+                    {
+                      //#region COLOR SWATCHES
+                    }
+                    <Box sx={{ flexGrow: 1 }}>
+                      <Tooltip title="Black" placement="bottom">
+                        <IconButton component="div" sx={{ padding: '6px' }}>
+                          <div className="color-picker-button color-swatch-black" style={{ backgroundColor: '#3c4043' }}></div>
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Blue" placement="bottom">
+                        <IconButton component="div" sx={{ padding: '6px' }}>
+                          <div className="color-picker-button color-swatch-blue" style={{ backgroundColor: '#19acc0' }}></div>
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Green" placement="bottom">
+                        <IconButton component="div" sx={{ padding: '6px' }}>
+                          <div className="color-picker-button color-swatch-green" style={{ backgroundColor: '#699e3e' }}></div>
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
 
-                <Box sx={{ flexGrow: 1 }}>
-                  <Tooltip title="White" placement="bottom">
-                    <IconButton component="div" sx={{ padding: '6px' }}>
-                      <div className="color-picker-button color-swatch-white" style={{ backgroundColor: 'white', border: '1px solid #dadce0' }}></div>
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Yellow" placement="bottom">
-                    <IconButton component="div" sx={{ padding: '6px' }}>
-                      <div className="color-picker-button color-swatch-yellow" style={{ backgroundColor: '#f3b32a' }}></div>
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Red" placement="bottom">
-                    <IconButton component="div" sx={{ padding: '6px' }}>
-                      <div className="color-picker-button color-swatch-red" style={{ backgroundColor: '#d9453c' }}></div>
-                    </IconButton>
-                  </Tooltip>
+                    <Box sx={{ flexGrow: 1 }}>
+                      <Tooltip title="White" placement="bottom">
+                        <IconButton component="div" sx={{ padding: '6px' }}>
+                          <div className="color-picker-button color-swatch-white" style={{ backgroundColor: 'white', border: '1px solid #dadce0' }}></div>
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Yellow" placement="bottom">
+                        <IconButton component="div" sx={{ padding: '6px' }}>
+                          <div className="color-picker-button color-swatch-yellow" style={{ backgroundColor: '#f3b32a' }}></div>
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Red" placement="bottom">
+                        <IconButton component="div" sx={{ padding: '6px' }}>
+                          <div className="color-picker-button color-swatch-red" style={{ backgroundColor: '#d9453c' }}></div>
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                    {
+                      //#endregion
+                    }
+                  </Box>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      flexDirection: 'column',
+                    }}
+                  >
+                    <Tooltip title="Color Picker" placement="bottom">
+                      <div style={{ width: '30px', height: '30px', borderRadius: '20px', overflow: 'hidden', display: 'inline-block', verticalAlign: 'bottom' }}>
+                        <input
+                          type="color"
+                          value={colorPicked}
+                          onChange={(e) => {
+                            onColorChange(e)
+                          }}
+                          style={{ border: 0, padding: 0, width: '150%', height: '150%', cursor: 'pointer', transform: 'translate(-25%, -25%)' }}
+                        />
+                      </div>
+                    </Tooltip>
+                    <Tooltip title="Size Slider" placement="bottom">
+                      <input
+                        type="range"
+                        min="1"
+                        max="100"
+                        id="myRange"
+                        value={brushSize}
+                        onChange={(e) => {
+                          setBrushSize(e.target.value)
+                          // console.log(e.target)
+                        }}
+                      />
+                    </Tooltip>
+                    <span>{brushSize} px</span>
+                  </Box>
                 </Box>
               </Box>
             </Popover>
@@ -312,44 +383,44 @@ const ToolBox = () => {
               >
                 <Box sx={{ flexGrow: 1, py: '4px' }} id="shapes-table">
                   <Tooltip title="Circle" placement="bottom">
-                    <StyledIconButton bgcol={bgColor} onClick={onShapeSelect} tool="circle">
+                    <StyledIconButton bgcol={bgColor} onClick={onShapeKindSelect} tool="circle">
                       <ToolBoxIcon.CircleIcon width={ICONSIZE} height={ICONSIZE} inner={'#333'} />
                     </StyledIconButton>
                   </Tooltip>
                   <Tooltip title="Square" placement="bottom">
-                    <StyledIconButton bgcol={bgColor} onClick={onShapeSelect} tool="square">
+                    <StyledIconButton bgcol={bgColor} onClick={onShapeKindSelect} tool="square">
                       <ToolBoxIcon.SquareIcon width={ICONSIZE} height={ICONSIZE} inner={'#333'} />
                     </StyledIconButton>
                   </Tooltip>
                   <Tooltip title="Triangle" placement="bottom">
-                    <StyledIconButton bgcol={bgColor} onClick={onShapeSelect} tool="triangle">
+                    <StyledIconButton bgcol={bgColor} onClick={onShapeKindSelect} tool="triangle">
                       <ToolBoxIcon.TriangleIcon width={ICONSIZE} height={ICONSIZE} inner={'#333'} />
                     </StyledIconButton>
                   </Tooltip>
                   <Tooltip title="Diamond" placement="bottom">
-                    <StyledIconButton bgcol={bgColor} onClick={onShapeSelect} tool="diamond">
+                    <StyledIconButton bgcol={bgColor} onClick={onShapeKindSelect} tool="diamond">
                       <ToolBoxIcon.RhombusIcon width={ICONSIZE} height={ICONSIZE} inner={'#333'} />
                     </StyledIconButton>
                   </Tooltip>
                 </Box>
                 <Box sx={{ flexGrow: 1, py: '4px' }} id="shapes-table">
                   <Tooltip title="Rounded Rectangle" placement="bottom">
-                    <StyledIconButton bgcol={bgColor} onClick={onShapeSelect} tool="rounded rectangle">
+                    <StyledIconButton bgcol={bgColor} onClick={onShapeKindSelect} tool="rounded rectangle">
                       <ToolBoxIcon.RoundedRectangleIcon width={ICONSIZE} height={ICONSIZE} inner={'#333'} />
                     </StyledIconButton>
                   </Tooltip>
                   <Tooltip title="Half circle" placement="bottom">
-                    <StyledIconButton bgcol={bgColor} onClick={onShapeSelect} tool="half circle">
+                    <StyledIconButton bgcol={bgColor} onClick={onShapeKindSelect} tool="half circle">
                       <ToolBoxIcon.HalfCircleIcon width={ICONSIZE} height={ICONSIZE} inner={'#333'} />
                     </StyledIconButton>
                   </Tooltip>
                   <Tooltip title="Bar" placement="bottom">
-                    <StyledIconButton bgcol={bgColor} onClick={onShapeSelect} tool="bar">
+                    <StyledIconButton bgcol={bgColor} onClick={onShapeKindSelect} tool="bar">
                       <ToolBoxIcon.BarIcon width={ICONSIZE} height={ICONSIZE} inner={'#333'} />
                     </StyledIconButton>
                   </Tooltip>
                   <Tooltip title="Arrow" placement="bottom">
-                    <StyledIconButton bgcol={bgColor} onClick={onShapeSelect} tool="arrow">
+                    <StyledIconButton bgcol={bgColor} onClick={onShapeKindSelect} tool="arrow">
                       <ToolBoxIcon.ArrowIcon width={ICONSIZE} height={ICONSIZE} inner={'#333'} />
                     </StyledIconButton>
                   </Tooltip>

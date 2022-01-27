@@ -11,6 +11,8 @@ const FabricTest = () => {
   const { brushSize, setBrushSize } = useContext(MainContext)
   const { eraserSize, setEraserSize } = useContext(MainContext)
   const { currentTool, setCurrentTool } = useContext(MainContext)
+  const { penMode, setPenMode } = useContext(MainContext)
+  const { shapeKind, setShapeKind } = useContext(MainContext)
 
   const [zoom, setZoom] = useState() // object{zoom double, fixed boolean}
   const [operation, setOperation] = useState(null) // object{zoom double, fixed boolean}
@@ -54,6 +56,55 @@ const FabricTest = () => {
     })
     return canvas
   }
+
+  const testFreeDrawingSwitch = () => {
+    if (!canvas) return
+    canvas.isDrawingMode = true
+    canvas.freeDrawingBrush.color = colorPicked
+    canvas.freeDrawingBrush.width = brushSize
+    canvas.freeDrawingCursor = `url(${getDrawCursor(brushSize, colorPicked, 1)}) ${brushSize / 2} ${brushSize / 2}, crosshair`
+    canvas.on('mouse:down', (event) => setFreeDrawingOnMouseDown)
+    canvas.on('mouse:up', (event) => {
+      // set cursor up mode with high opacity
+      canvas.freeDrawingCursor = `url(${getDrawCursor(brushSize, colorPicked, 0.8)}) ${brushSize / 2} ${brushSize / 2}, crosshair`
+      // console.log(event)
+      // console.log(event.e)
+      event.currentTarget.selectable = false // static으로 만든다
+    })
+  }
+
+  function setFreeDrawingOnMouseDown(event) {
+    // set cursor down mode with high transparency
+    canvas.freeDrawingCursor = `url(${getDrawCursor(brushSize, colorPicked, 0.2)}) ${brushSize / 2} ${brushSize / 2}, crosshair`
+  }
+
+  useEffect(() => {
+    if (currentTool && canvas) {
+      switch (currentTool) {
+        case ToolsEnum.FREE_DRAWING:
+          testFreeDrawingSwitch()
+          break
+        case ToolsEnum.ERASER:
+          break
+        case ToolsEnum.SELECT:
+          canvas.isDrawingMode = false
+          break
+        case ToolsEnum.STICKY_NOTE:
+          break
+        case ToolsEnum.SHAPES_DRAWING:
+          break
+        case ToolsEnum.IMAGE:
+          break
+        case ToolsEnum.TEXTBOX:
+          break
+        case ToolsEnum.LASER:
+          break
+        default:
+          canvas.isDrawingMode = false
+      }
+    }
+    // return () => {}
+  }, [currentTool, colorPicked, brushSize])
 
   const addRect = (canvi) => {
     // console.log('button works!')
