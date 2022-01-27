@@ -1,21 +1,16 @@
-import React, { useState, useLayoutEffect, useEffect, useContext } from 'react'
-import { MainContext, ToolsEnum } from '../MainContextProvider'
+import React, { useState, useLayoutEffect, useEffect } from 'react'
 import { fabric } from 'fabric'
 
 const FabricTest = () => {
-  const { canvas, setCanvas } = useContext(MainContext)
-  const { imgURL, setImgURL } = useContext(MainContext)
-  const { undo, setUndo } = useContext(MainContext)
-  const { redo, setRedo } = useContext(MainContext)
-  const { colorPicked, setColorPicked } = useContext(MainContext)
-  const { brushSize, setBrushSize } = useContext(MainContext)
-  const { eraserSize, setEraserSize } = useContext(MainContext)
-  const { currentTool, setCurrentTool } = useContext(MainContext)
-
+  const [canvas, setCanvas] = useState(null)
+  const [imgURL, setImgURL] = useState('')
   const [zoom, setZoom] = useState() // object{zoom double, fixed boolean}
   const [operation, setOperation] = useState(null) // object{zoom double, fixed boolean}
+  const [undo, setUndo] = useState([])
+  const [redo, setRedo] = useState([])
   const winSize = useWindowSize()
   const brushColor = 'hotpink'
+  const brushSize = 30
 
   useLayoutEffect(() => {
     console.log('load canvas')
