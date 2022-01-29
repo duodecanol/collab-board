@@ -1,18 +1,26 @@
 import React, { useState, useLayoutEffect, useEffect, useContext } from 'react'
-import { MainContext, ToolsEnum } from '../MainContextProvider'
 import { fabric } from 'fabric'
+import { useSelector, useDispatch } from 'react-redux'
+import { setCanvas } from '../../features/canvas/canvasSlice'
+import { pushUndo, popUndo } from '../../features/undo/undoSlice'
+import { pushRedo, popRedo } from '../../features/redo/redoSlice'
+import { TOOLS } from '../../helpers/toolsEnum'
 
 const FabricTest = () => {
-  const { canvas, setCanvas } = useContext(MainContext)
-  const { imgURL, setImgURL } = useContext(MainContext)
-  const { undo, setUndo } = useContext(MainContext)
-  const { redo, setRedo } = useContext(MainContext)
-  const { colorPicked, setColorPicked } = useContext(MainContext)
-  const { brushSize, setBrushSize } = useContext(MainContext)
-  const { eraserSize, setEraserSize } = useContext(MainContext)
-  const { currentTool, setCurrentTool } = useContext(MainContext)
-  const { penMode, setPenMode } = useContext(MainContext)
-  const { shapeKind, setShapeKind } = useContext(MainContext)
+  // const canvas = useSelector((state) => state.canvas.value)
+  const [canvas, setCanvas] = useState(null)
+  const undo = useSelector((state) => state.undo.value)
+  const redo = useSelector((state) => state.redo.value)
+  const colorPicked = useSelector((state) => state.colorPicked.value)
+  const brushSize = useSelector((state) => state.brushSize.value)
+  const eraserSize = useSelector((state) => state.eraserSize.value)
+  const currentTool = useSelector((state) => state.currentTool.value)
+  const penMode = useSelector((state) => state.penMode.value)
+  const shapeKind = useSelector((state) => state.shapeKind.value)
+  // const { imgURL, setImgURL } = useContext(MainContext)
+  const [imgURL, setImgURL] = useState('')
+
+  const dispatch = useDispatch()
 
   const [zoom, setZoom] = useState() // object{zoom double, fixed boolean}
   const [operation, setOperation] = useState(null) // object{zoom double, fixed boolean}
@@ -26,6 +34,7 @@ const FabricTest = () => {
 
   useEffect(() => {
     console.log('winsize', JSON.stringify(winSize))
+    //FIXME: Browser dimension y가 더 클때 x margin 제대로 반영되어야함
     if (canvas) {
       console.log('canvasSize', `width: ${canvas.getWidth()}, height: ${canvas.getHeight()}`)
       let scaleRatio = Math.min(winSize.width / canvas.getWidth(), (winSize.height - 200) / canvas.getHeight())
@@ -57,54 +66,50 @@ const FabricTest = () => {
     return canvas
   }
 
-  const testFreeDrawingSwitch = () => {
-    if (!canvas) return
-    canvas.isDrawingMode = true
-    canvas.freeDrawingBrush.color = colorPicked
-    canvas.freeDrawingBrush.width = brushSize
-    canvas.freeDrawingCursor = `url(${getDrawCursor(brushSize, colorPicked, 1)}) ${brushSize / 2} ${brushSize / 2}, crosshair`
-    canvas.on('mouse:down', (event) => setFreeDrawingOnMouseDown)
-    canvas.on('mouse:up', (event) => {
-      // set cursor up mode with high opacity
-      canvas.freeDrawingCursor = `url(${getDrawCursor(brushSize, colorPicked, 0.8)}) ${brushSize / 2} ${brushSize / 2}, crosshair`
-      // console.log(event)
-      // console.log(event.e)
-      event.currentTarget.selectable = false // static으로 만든다
-    })
-  }
-
-  function setFreeDrawingOnMouseDown(event) {
-    // set cursor down mode with high transparency
-    canvas.freeDrawingCursor = `url(${getDrawCursor(brushSize, colorPicked, 0.2)}) ${brushSize / 2} ${brushSize / 2}, crosshair`
-  }
-
   useEffect(() => {
     if (currentTool && canvas) {
       switch (currentTool) {
-        case ToolsEnum.FREE_DRAWING:
-          testFreeDrawingSwitch()
+        case TOOLS.FREE_DRAWING:
+          if (!canvas) return
+          canvas.isDrawingMode = true
+          canvas.freeDrawingBrush.color = colorPicked
+          canvas.freeDrawingBrush.width = brushSize
+          canvas.freeDrawingCursor = `url(${getDrawCursor(brushSize, colorPicked, 1)}) ${brushSize / 2} ${brushSize / 2}, crosshair`
+          canvas.on('mouse:down', (event) => {
+            canvas.freeDrawingCursor = `url(${getDrawCursor(brushSize, colorPicked, 0.2)}) ${brushSize / 2} ${brushSize / 2}, crosshair`
+          })
+          canvas.on('mouse:up', (event) => {
+            // set cursor up mode with high opacity
+            canvas.freeDrawingCursor = `url(${getDrawCursor(brushSize, colorPicked, 0.8)}) ${brushSize / 2} ${brushSize / 2}, crosshair`
+            // console.log(event)
+            // console.log(event.e)
+            event.currentTarget.selectable = false // static으로 만든다
+          })
+
           break
-        case ToolsEnum.ERASER:
+        case TOOLS.ERASER:
           break
-        case ToolsEnum.SELECT:
+        case TOOLS.SELECT:
           canvas.isDrawingMode = false
           break
-        case ToolsEnum.STICKY_NOTE:
+        case TOOLS.STICKY_NOTE:
           break
-        case ToolsEnum.SHAPES_DRAWING:
+        case TOOLS.SHAPES_DRAWING:
           break
-        case ToolsEnum.IMAGE:
+        case TOOLS.IMAGE:
           break
-        case ToolsEnum.TEXTBOX:
+        case TOOLS.TEXTBOX:
           break
-        case ToolsEnum.LASER:
+        case TOOLS.LASER:
           break
         default:
           canvas.isDrawingMode = false
       }
     }
-    // return () => {}
-  }, [currentTool])
+    return () => {
+      setCanvas(canvas)
+    }
+  }, [currentTool, colorPicked, brushSize])
 
   const addRect = (canvi) => {
     // console.log('button works!')
@@ -124,7 +129,7 @@ const FabricTest = () => {
       img.scale(0.75)
       canvi.add(img)
       canvi.renderAll()
-      setImgURL('')
+      setImgURL('') // reset img URL
     })
   }
 
@@ -150,14 +155,6 @@ const FabricTest = () => {
     `
 
     return `data:image/svg+xml;base64,${window.btoa(circle)}`
-  }
-
-  const save = () => {
-    setRedo([])
-    if (operation) {
-      undo.push(operation)
-    }
-    console.log(operation)
   }
 
   function toggleDrawingMode() {
@@ -188,7 +185,7 @@ const FabricTest = () => {
         console.log(event.e)
         event.currentTarget.selectable = false // static으로 만든다
         // append operation to undo array
-        setUndo((undo) => [...undo, event.currentTarget])
+        dispatch(pushUndo(event.currentTarget))
       })
     }
   }
@@ -201,9 +198,9 @@ const FabricTest = () => {
           onClick={() => {
             // UNDO operation
             console.log('undo', undo)
-            // let object = canvas.item(canvas.getObjects().length - 1)
-            let object = undo.pop() // 왜 direct pop 이 먹히지?
-            setRedo((redo) => [...redo, object])
+            let object = undo[undo.length - 1]
+            dispatch(popUndo())
+            dispatch(pushRedo(object))
             canvas.remove(object)
           }}
           disabled={undo.length === 0}
@@ -215,8 +212,9 @@ const FabricTest = () => {
           onClick={() => {
             // REDO operation
             console.log('redo', redo)
-            let object = redo.pop()
-            setUndo((undo) => [...undo, object])
+            let object = redo[redo.length - 1]
+            dispatch(popRedo())
+            dispatch(pushUndo(object))
             canvas.add(object)
           }}
           disabled={redo.length === 0}

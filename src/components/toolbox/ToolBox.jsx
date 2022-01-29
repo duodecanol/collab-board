@@ -1,8 +1,18 @@
 import { Box, Container, Toolbar, IconButton, ButtonGroup, Tooltip, Popover } from '@mui/material'
-import React, { useState, useContext } from 'react'
+import React, { useState } from 'react'
 import { styled } from '@mui/material/styles'
 
-import { MainContext, ToolsEnum } from '../MainContextProvider'
+import { useSelector, useDispatch } from 'react-redux'
+// import { setCanvas } from '../../features/canvas/canvasSlice'
+import { setColorPicked } from '../../features/colorPicked/colorPickedSlice'
+import { setBrushSize } from '../../features/brushSize/brushSizeSlice'
+import { setEraserSize } from '../../features/eraserSize/eraserSizeSlice'
+import { setCurrentTool } from '../../features/currentTool/currentToolSlice'
+import { setPenMode } from '../../features/penMode/penModeSlice'
+import { setShapeKind } from '../../features/shapeKind/shapeKindSlice'
+
+import { TOOLS } from '../../helpers/toolsEnum'
+
 import './style.css'
 import * as ToolBoxIcon from './Icons'
 
@@ -22,13 +32,15 @@ const StyledIconButton = styled(IconButton, {
 }))
 
 const ToolBox = () => {
-  const { canvas, setCanvas } = useContext(MainContext)
-  const { colorPicked, setColorPicked } = useContext(MainContext)
-  const { brushSize, setBrushSize } = useContext(MainContext)
-  const { eraserSize, setEraserSize } = useContext(MainContext)
-  const { currentTool, setCurrentTool } = useContext(MainContext)
-  const { penMode, setPenMode } = useContext(MainContext)
-  const { shapeKind, setShapeKind } = useContext(MainContext)
+  // const canvas = useSelector((state) => state.canvas.value)
+  const colorPicked = useSelector((state) => state.colorPicked.value)
+  const brushSize = useSelector((state) => state.brushSize.value)
+  const eraserSize = useSelector((state) => state.eraserSize.value)
+  const currentTool = useSelector((state) => state.currentTool.value)
+  const penMode = useSelector((state) => state.penMode.value)
+  const shapeKind = useSelector((state) => state.shapeKind.value)
+
+  const dispatch = useDispatch()
 
   const [penAnchorEl, setPenAnchorEl] = useState(null)
   const [shapeAnchorEl, setShapeAnchorEl] = useState(null)
@@ -40,17 +52,17 @@ const ToolBox = () => {
   const onPenModeSelect = (e) => {
     console.log(e.currentTarget.attributes['tool'].value)
     // setCurrentShape(null)
-    setPenMode(e.currentTarget.attributes['tool'].value)
+    dispatch(setPenMode(e.currentTarget.attributes['tool'].value))
   }
 
   const onShapeKindSelect = (e) => {
     console.log(e.currentTarget.attributes['tool'].value)
     // setCurrentTool(null)
-    setShapeKind(e.currentTarget.attributes['tool'].value)
+    dispatch(setShapeKind(e.currentTarget.attributes['tool'].value))
   }
 
   const handleToolSelect = (key) => {
-    setCurrentTool(key)
+    dispatch(setCurrentTool(key))
   }
 
   const handlePenClick = (event) => {
@@ -79,7 +91,7 @@ const ToolBox = () => {
     if (e.target.value.indexOf('#') !== 0 && e.target.value.length !== 7) {
       throw Error('Not an Hex rgb. Must be "#0099FF" pattern')
     }
-    setColorPicked(e.target.value) // set picked color
+    dispatch(setColorPicked(e.target.value)) // set picked color
     let hexRgb = e.target.value.replace('#', '')
     let r = parseInt(hexRgb.slice(0, 2), 16),
       g = parseInt(hexRgb.slice(2, 4), 16),
@@ -126,51 +138,47 @@ const ToolBox = () => {
           <ButtonGroup orientation="vertical">
             <Tooltip title={penMode && penMode.capitalize()} placement="right">
               <StyledIconButton
-                bgcol={currentTool === ToolsEnum.FREE_DRAWING ? fgColor : bgColor}
+                bgcol={currentTool === TOOLS.FREE_DRAWING ? fgColor : bgColor}
                 aria-describedby={penPopoverId}
                 variant="contained"
-                key={ToolsEnum.FREE_DRAWING}
+                key={TOOLS.FREE_DRAWING}
                 onClick={(e) => {
                   handlePenClick(e)
-                  handleToolSelect(ToolsEnum.FREE_DRAWING)
+                  handleToolSelect(TOOLS.FREE_DRAWING)
                 }}
-                style={{ outline: currentTool === ToolsEnum.FREE_DRAWING ? `2px solid ${fgColor}` : '' }}
+                style={{ outline: currentTool === TOOLS.FREE_DRAWING ? `2px solid ${fgColor}` : '' }}
               >
-                {penMode === 'pen' && <ToolBoxIcon.PenIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === ToolsEnum.FREE_DRAWING ? '#eeeeee' : fgColor} />}
-                {penMode === 'marker' && <ToolBoxIcon.MarkerIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === ToolsEnum.FREE_DRAWING ? '#eeeeee' : fgColor} />}
-                {penMode === 'highlighter' && <ToolBoxIcon.HighlighterIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === ToolsEnum.FREE_DRAWING ? '#eeeeee' : fgColor} />}
-                {penMode === 'brush' && <ToolBoxIcon.BrushIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === ToolsEnum.FREE_DRAWING ? '#eeeeee' : fgColor} />}
+                {/*FIXME: Hover 상태일 때 inner == fgColor  */}
+                {penMode === 'pen' && <ToolBoxIcon.PenIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === TOOLS.FREE_DRAWING ? '#eeeeee' : fgColor} />}
+                {penMode === 'marker' && <ToolBoxIcon.MarkerIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === TOOLS.FREE_DRAWING ? '#eeeeee' : fgColor} />}
+                {penMode === 'highlighter' && <ToolBoxIcon.HighlighterIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === TOOLS.FREE_DRAWING ? '#eeeeee' : fgColor} />}
+                {penMode === 'brush' && <ToolBoxIcon.BrushIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === TOOLS.FREE_DRAWING ? '#eeeeee' : fgColor} />}
               </StyledIconButton>
             </Tooltip>
 
             <Tooltip title="Erase" placement="right">
-              <StyledIconButton
-                className="earser"
-                key={ToolsEnum.ERASER}
-                onClick={() => handleToolSelect(ToolsEnum.ERASER)}
-                style={{ backgroundColor: currentTool === ToolsEnum.ERASER ? '#333' : 'transparent' }}
-              >
-                <ToolBoxIcon.EraserIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === ToolsEnum.ERASER ? '#eeeeee' : '#333'} />
+              <StyledIconButton className="earser" key={TOOLS.ERASER} onClick={() => handleToolSelect(TOOLS.ERASER)} style={{ backgroundColor: currentTool === TOOLS.ERASER ? '#333' : 'transparent' }}>
+                <ToolBoxIcon.EraserIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === TOOLS.ERASER ? '#eeeeee' : '#333'} />
               </StyledIconButton>
             </Tooltip>
             <Tooltip title="Select" placement="right">
               <StyledIconButton
                 className="selectorButton"
-                key={ToolsEnum.SELECT}
-                onClick={() => handleToolSelect(ToolsEnum.SELECT)}
-                style={{ backgroundColor: currentTool === ToolsEnum.SELECT ? '#333' : 'transparent' }}
+                key={TOOLS.SELECT}
+                onClick={() => handleToolSelect(TOOLS.SELECT)}
+                style={{ backgroundColor: currentTool === TOOLS.SELECT ? '#333' : 'transparent' }}
               >
-                <ToolBoxIcon.SelectorIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === ToolsEnum.SELECT ? '#eeeeee' : '#333'} />
+                <ToolBoxIcon.SelectorIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === TOOLS.SELECT ? '#eeeeee' : '#333'} />
               </StyledIconButton>
             </Tooltip>
             <Tooltip title="Sticky Note (Ctrl+Shift+P)" placement="right">
               <StyledIconButton
                 className="stickyNoteButton"
-                key={ToolsEnum.STICKY_NOTE}
-                onClick={() => handleToolSelect(ToolsEnum.STICKY_NOTE)}
-                style={{ backgroundColor: currentTool === ToolsEnum.STICKY_NOTE ? '#333' : 'transparent' }}
+                key={TOOLS.STICKY_NOTE}
+                onClick={() => handleToolSelect(TOOLS.STICKY_NOTE)}
+                style={{ backgroundColor: currentTool === TOOLS.STICKY_NOTE ? '#333' : 'transparent' }}
               >
-                <ToolBoxIcon.StickyNoteIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === ToolsEnum.STICKY_NOTE ? '#eeeeee' : '#333'} />
+                <ToolBoxIcon.StickyNoteIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === TOOLS.STICKY_NOTE ? '#eeeeee' : '#333'} />
               </StyledIconButton>
             </Tooltip>
             <Tooltip title={shapeKind && shapeKind.capitalize()} placement="right">
@@ -178,12 +186,12 @@ const ToolBox = () => {
                 bgcol={bgColor}
                 aria-describedby={shapesPopoverId}
                 variant="contained"
-                key={ToolsEnum.SHAPES_DRAWING}
+                key={TOOLS.SHAPES_DRAWING}
                 onClick={(e) => {
                   handleShapeClick(e)
-                  handleToolSelect(ToolsEnum.SHAPES_DRAWING)
+                  handleToolSelect(TOOLS.SHAPES_DRAWING)
                 }}
-                style={{ outline: currentTool === ToolsEnum.SHAPES_DRAWING ? `2px solid ${fgColor}` : '' }}
+                style={{ outline: currentTool === TOOLS.SHAPES_DRAWING ? `2px solid ${fgColor}` : '' }}
               >
                 {shapeKind === 'circle' && <ToolBoxIcon.CircleIcon width={ICONSIZE} height={ICONSIZE} inner={'#333'} />}
                 {shapeKind === 'square' && <ToolBoxIcon.SquareIcon width={ICONSIZE} height={ICONSIZE} inner={'#333'} />}
@@ -199,31 +207,31 @@ const ToolBox = () => {
             <Tooltip title="Add image" placement="right">
               <StyledIconButton
                 className="imageButton"
-                key={ToolsEnum.IMAGE}
-                onClick={() => handleToolSelect(ToolsEnum.IMAGE)}
-                style={{ backgroundColor: currentTool === ToolsEnum.IMAGE ? '#333' : 'transparent' }}
+                key={TOOLS.IMAGE}
+                onClick={() => handleToolSelect(TOOLS.IMAGE)}
+                style={{ backgroundColor: currentTool === TOOLS.IMAGE ? '#333' : 'transparent' }}
               >
-                <ToolBoxIcon.ImageIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === ToolsEnum.IMAGE ? '#eeeeee' : '#333'} />
+                <ToolBoxIcon.ImageIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === TOOLS.IMAGE ? '#eeeeee' : '#333'} />
               </StyledIconButton>
             </Tooltip>
             <Tooltip title="Text Box" placement="right">
               <StyledIconButton
                 className="textBoxButton"
-                key={ToolsEnum.TEXTBOX}
-                onClick={() => handleToolSelect(ToolsEnum.TEXTBOX)}
-                style={{ backgroundColor: currentTool === ToolsEnum.TEXTBOX ? '#333' : 'transparent' }}
+                key={TOOLS.TEXTBOX}
+                onClick={() => handleToolSelect(TOOLS.TEXTBOX)}
+                style={{ backgroundColor: currentTool === TOOLS.TEXTBOX ? '#333' : 'transparent' }}
               >
-                <ToolBoxIcon.TextBoxIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === ToolsEnum.TEXTBOX ? '#eeeeee' : '#333'} />
+                <ToolBoxIcon.TextBoxIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === TOOLS.TEXTBOX ? '#eeeeee' : '#333'} />
               </StyledIconButton>
             </Tooltip>
             <Tooltip title="Laser" placement="right">
               <StyledIconButton
                 className="laserButton"
-                key={ToolsEnum.LASER}
-                onClick={() => handleToolSelect(ToolsEnum.LASER)}
-                style={{ backgroundColor: currentTool === ToolsEnum.LASER ? 'rgb(219,68,55)' : '#eeeeee' }}
+                key={TOOLS.LASER}
+                onClick={() => handleToolSelect(TOOLS.LASER)}
+                style={{ backgroundColor: currentTool === TOOLS.LASER ? 'rgb(219,68,55)' : '#eeeeee' }}
               >
-                <ToolBoxIcon.LaserIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === ToolsEnum.LASER ? 'white' : '#333'} />
+                <ToolBoxIcon.LaserIcon width={ICONSIZE} height={ICONSIZE} inner={currentTool === TOOLS.LASER ? 'white' : '#333'} />
               </StyledIconButton>
             </Tooltip>
 
@@ -348,7 +356,7 @@ const ToolBox = () => {
                         id="myRange"
                         value={brushSize}
                         onChange={(e) => {
-                          setBrushSize(e.target.value)
+                          dispatch(setBrushSize(e.target.value))
                           // console.log(e.target)
                         }}
                       />
