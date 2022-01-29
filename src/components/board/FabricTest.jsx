@@ -104,7 +104,7 @@ const FabricTest = () => {
       }
     }
     // return () => {}
-  }, [currentTool, colorPicked, brushSize])
+  }, [currentTool])
 
   const addRect = (canvi) => {
     // console.log('button works!')
